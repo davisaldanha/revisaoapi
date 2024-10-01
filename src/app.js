@@ -178,6 +178,7 @@ app.put('/matricula', (req, res) => {
         }
 
         if(result.affectedRows > 0){
+            addAluno(turmaId) // Incrementar a quantidade de alunos na turma
             return res.status(200).json({message: 'Matricula realizada com sucesso!'})
         }
 
@@ -189,6 +190,7 @@ app.put('/matricula', (req, res) => {
 //Desmatricular
 app.put('/offmatricula', (req, res) => {
     let aluno_id = req.body.aluno_id
+    let turma_id = req.body.turma_id
 
     database.query('UPDATE aluno SET fk_turma=? WHERE id=?', [null, aluno_id], (err, result) => {
         if(err){
@@ -196,6 +198,7 @@ app.put('/offmatricula', (req, res) => {
         }
 
         if(result.affectedRows > 0){
+            delAluno(turma_id) //decrementar a quantidade de alunos na turma
             return res.status(200).json({message: 'Desmatricula realizada com sucesso!'})
         }
 
