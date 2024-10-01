@@ -161,4 +161,67 @@ app.put('/turma/:id', (req, res) => {
     })
 })
 
+//Rotas Matricula
+//Matricular
+app.put('/matricula', (req, res) => {
+    let alunoId = req.body.aluno_id
+    let turmaId = req.body.turma_id 
+
+    if (!alunoId ||!turmaId) {
+        return res.status(400).json({message: 'Todos os dados são obrigatórios'})
+    }
+
+    database.query('UPDATE aluno SET fk_turma=? WHERE id=?', [turmaId, alunoId], (err, result)=>{
+
+        if(err){
+            return res.status(500).json(err)
+        }
+
+        if(result.affectedRows > 0){
+            return res.status(200).json({message: 'Matricula realizada com sucesso!'})
+        }
+
+        return res.status(404).json({message: 'Aluno ou turma não encontrado!'})
+
+    })
+})
+
+//Desmatricular
+app.put('/offmatricula', (req, res) => {
+    let aluno_id = req.body.aluno_id
+
+    database.query('UPDATE aluno SET fk_turma=? WHERE id=?', [null, aluno_id], (err, result) => {
+        if(err){
+            return res.status(500).json(err)
+        }
+
+        if(result.affectedRows > 0){
+            return res.status(200).json({message: 'Desmatricula realizada com sucesso!'})
+        }
+
+        return res.status(404).json({message: 'Aluno não encontrado!'})
+    })
+})
+
+
+//Funções para alterar quantidade de alunos por turma
+//Incrementar
+function addAluno(idturma){
+    database.query('UPDATE turma SET quantidade=quantidade+1 WHERE id=?', [idturma], (err, result) => {
+        if(err){
+            console.error(err)
+        }
+    })
+}
+
+//Decrementar
+function delAluno(idturma){
+    database.query('UPDATE turma SET quantidade=quantidade-1 WHERE id=?', [idturma], (err, result) => {
+        if(err){
+            console.error(err)
+        }
+    })
+}
+
+
 app.listen(3000, () => console.log(`Servidor rodando na porta ${3000}.`))
