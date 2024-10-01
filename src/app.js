@@ -106,10 +106,59 @@ app.get('/turmas', (req, res) => {
 })
 
 //POST
+app.post('/turma', (req, res) => {
+    let nome = req.body.nome
+
+    if (!nome) {
+        return res.status(400).json({message: 'Todos os dados são obrigatórios'})
+    }
+
+    database.query('INSERT INTO turma(nome) VALUES(?)', [nome], (err, result) => {
+        if(err){
+            return res.status(500).json(err)
+        }
+
+        return res.status(201).json({message: 'Turma cadastrada com sucesso!', turma: result.insertId})
+    })
+})
 
 //DELETE
+app.delete('/turma/:id', (req, res) => {
+    let id = req.params.id
+
+    database.query('DELETE FROM turma WHERE id =?', [id], (err, result) => {
+        if(err){
+            return res.status(500).json(err)
+        }
+
+        if(result.affectedRows > 0){
+            return res.status(200).json({message: 'Turma deletada com sucesso!'})
+        }
+
+        return res.status(404).json({message: 'Turma não encontrada!'})
+    })
+})
 
 //UPDATE
+app.put('/turma/:id', (req, res) => {
+    let id = req.params.id
+    let nome = req.body.nome
 
+    if (!nome) {
+        return res.status(400).json({message: 'Todos os dados são obrigatórios'})
+    }
+
+    database.query('UPDATE turma SET nome=? WHERE id=?', [nome, id], (err, result) => {
+        if(err){
+            return res.status(500).json(err)
+        }
+
+        if(result.affectedRows > 0){
+            return res.status(200).json({message: 'Turma atualizada com sucesso!'})
+        }
+
+        return res.status(404).json({message: 'Turma não encontrada!'})
+    })
+})
 
 app.listen(3000, () => console.log(`Servidor rodando na porta ${3000}.`))
