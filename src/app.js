@@ -7,12 +7,18 @@ const database = require("./database")
 //Importar o body-parser
 const bodyParser = require('body-parser')
 
+//Importar o cors
+const cors = require('cors')
+
 //Criar uma instância do express
 const app = express();
 
 //Usar o body-parser para interpretar os dados enviados via JSON e URL-encoded
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
+
+//Usar o cors para permitir que a API seja acessada de qualquer origem
+app.use(cors())
 
 //Rotas ALUNO
 //GET
@@ -158,6 +164,21 @@ app.put('/turma/:id', (req, res) => {
         }
 
         return res.status(404).json({message: 'Turma não encontrada!'})
+    })
+})
+
+//GET
+app.get('/lista', (req, res) => {
+    database.query('SELECT a.id, a.nome aluno, t.nome turma FROM aluno a INNER JOIN turma t ON a.fk_turma = t.id', (err, result) => {
+        if (err) {
+            return res.status(500).json(err)
+        }
+
+        if(result.length > 0){
+            return res.status(200).json(result)
+        }
+
+        return res.status(200).json({message: 'Nenhuma matrícula realizada!'})
     })
 })
 
